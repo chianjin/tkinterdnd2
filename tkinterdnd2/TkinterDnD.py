@@ -32,6 +32,17 @@ except ImportError:
 
 TkdndVersion = None
 
+_platforms = {
+        "64": {
+                "Darwin": "osx64",
+                "Linux": "linux64",
+                "Windows": "win64"
+                },
+        "32": {
+                "Windows": "win32"
+                }
+        }
+
 def _require(tkroot):
     '''Internal function.'''
     global TkdndVersion
@@ -39,14 +50,10 @@ def _require(tkroot):
         import os.path
         import platform
 
-        if platform.system()=="Darwin":
-            tkdnd_platform_rep = "osx64"
-        elif platform.system()=="Linux":
-            tkdnd_platform_rep = "linux64"
-        elif platform.system()=="Windows":
-            tkdnd_platform_rep = "win64"
-        else:
-            raise RuntimeError('Plaform not supported.')
+        try:
+            tkdnd_platform_rep = _platforms[platform.architecture()[0][:2]][platform.system()]
+        except KeyError:
+            raise RuntimeError('Platform not supported.')
         
         module_path = os.path.join(os.path.dirname(__file__), 'tkdnd', tkdnd_platform_rep)
         tkroot.tk.call('lappend', 'auto_path', module_path)
